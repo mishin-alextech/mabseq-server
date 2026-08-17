@@ -1,0 +1,67 @@
+==========================================
+VHH Pipeline: Full Run
+==========================================
+Using ANARCI from: /home/admalexm/ANARCI-master
+Config: /home/admalexm/Auto-mAbSeq-Server/config/config.yaml
+Dry run: --no-dry-run
+
+Step 0: Normalizing and renaming .ab1 files...
+
+.ab1 File Normalization and Renaming
+  Method: hybrid
+  Strict mode: False
+  Output format: {chain}_cDNA_{animal}_{sample}
+  Log directory: data/logs
+
+====================================================================================================
+Processing and Renaming 20 .ab1 Files
+====================================================================================================
+Dry run: False
+Output directory: data/raw/sanger
+
+#    Original Name                                      →  New Name                            Status    
+-----------------------------------------------------------------------------------------------------
+1    A1_VHeavy_raw_cDNA_Rb_HBS3164_20250922_133832.ab1  → VHeavy_cDNA_Rb_HBS3164.ab1          ✓ OK      
+2    A2_VLambda_raw_cDNA_Ov_HBE91019_20251001_191522.ab1 → VLambda_cDNA_Ov_HBE91019.ab1        ✓ OK      
+3    B1_VHeavy_raw_cDNA_Rb_HBS3165_20250922_133833.ab1  → VHeavy_cDNA_Rb_HBS3165.ab1          ✓ OK      
+4    B2_VLambda_raw_cDNA_Ov_HBE91020_20251001_191523.ab1 → VLambda_cDNA_Ov_HBE91020.ab1        ✓ OK      
+5    B5_VHeavy_raw_cDNA_Rb_HBE3024_20250801_013708.ab1  → VHeavy_cDNA_Rb_HBE3024.ab1          ✓ OK      
+6    C2_VLambda_raw_cDNA_Ov_HBE91021_20251001_191524.ab1 → VLambda_cDNA_Ov_HBE91021.ab1        ✓ OK      
+7    D2_VLambda_raw_cDNA_Ov_HBE91022_20251001_191525.ab1 → VLambda_cDNA_Ov_HBE91022.ab1        ✓ OK      
+8    G2_VLambda_raw_cDNA_Ov_HBE91025_20251001_210016.ab1 → VLambda_cDNA_Ov_HBE91025.ab1        ✓ OK      
+9    H2_VLambda_raw_cDNA_Ov_HBE91026_20251001_210017.ab1 → VLambda_cDNA_Ov_HBE91026.ab1        ✓ OK      
+10   VHeavy_raw_seq_cDNA_Ov_CG91104_20251024_173615.ab1 → VHeavy_cDNA_Ov_CG91104.ab1          ✓ OK      
+11   VHeavy_raw_seq_cDNA_Ov_CG91108_20251024_173616.ab1 → VHeavy_cDNA_Ov_CG91108.ab1          ✓ OK      
+12   VHeavy_raw_seq_cDNA_Rb_TN3444.ab1                  → VHeavy_cDNA_Rb_TN3444.ab1           ✓ OK      
+13   VHeavy_raw_seq_cDNA_Rb_TN3560.ab1                  → VHeavy_cDNA_Rb_TN3560.ab1           ✓ OK      
+14   VKappa_raw_seq_cDNA_Ov_CG91408_20251031_142005.ab1 → VKappa_cDNA_Ov_CG91408.ab1          ✓ OK      
+15   VKappa_raw_seq_cDNA_Ov_CG91422_v3.ab1              → VKappa_cDNA_Ov_CG91422_v3.ab1       ✓ OK      
+16   VKappa_raw_seq_cDNA_Rb_TN3203.ab1                  → VKappa_cDNA_Rb_TN3203.ab1           ✓ OK      
+17   VKappa_raw_seq_cDNA_Rb_TN3359.ab1                  → VKappa_cDNA_Rb_TN3359.ab1           ✓ OK      
+18   VLambda_raw_seq_cDNA_Ov_CG91113_v3.ab1             → VLambda_cDNA_Ov_CG91113_v3.ab1      ✓ OK      
+19   VLambda_raw_seq_cDNA_Ov_CG91404-1-F02-A96Well.ab1  → FAILED.ab1                          ⚠ WARN    
+     └─ ERROR: Failed to match any regex pattern
+20   VLambda_raw_seq_cDNA_Ov_CG91416_v3.ab1             → VLambda_cDNA_Ov_CG91416_v3.ab1      ✓ OK      
+
+====================================================================================================
+Writing logs...
+====================================================================================================
+ Mapping log: data/logs/id_mapping.txt
+ Detailed log: data/logs/id_processing_detailed_20251208_122452.log
+ Summary log: data/logs/id_processing_summary_20251208_122452.log
+ Errors log: data/logs/id_processing_errors_20251208_122452.log
+
+====================================================================================================
+Summary:
+  Total processed: 20
+  Renamed: 19
+  Skipped: 0
+  Failed: 2
+====================================================================================================
+
+
+Step 1: AB1 to FASTA conversion...
+  File "/home/admalexm/Auto-mAbSeq-Server/workflow/scripts/convert_ab1_multiframe.py", line 53
+    "
+    ^
+SyntaxError: unterminated string literal (detected at line 53)

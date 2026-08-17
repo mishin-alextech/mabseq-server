@@ -1,0 +1,97 @@
+==========================================
+VHH Pipeline: Full Run
+==========================================
+Using ANARCI from: /home/admalexm/ANARCI-master
+Config: /home/admalexm/прошлые версии vhh_pipeline/Auto-mAbSeq-Server/config/config.yaml
+Dry run: --no-dry-run
+
+Step 0: Normalizing and renaming .ab1 files...
+
+.ab1 File Normalization and Renaming
+  Method: hybrid
+  Strict mode: False
+  Output format: {chain}_cDNA_{animal}_{sample}
+  Log directory: data/logs
+
+====================================================================================================
+Processing and Renaming 4 .ab1 Files
+====================================================================================================
+Dry run: False
+Output directory: data/raw/sanger
+
+#    Original Name                                      →  New Name                            Status    
+-----------------------------------------------------------------------------------------------------
+1    --VHeavy_raw_cDNA_TN3139_01-1-F02-A96Well.ab1      → FAILED.ab1                          ⚠ WARN    
+     └─ ERROR: Failed to match any regex pattern
+2    --VHeavy_raw_cDNA_TN91240-1-B01-A96Well.ab1        → FAILED.ab1                          ⚠ WARN    
+     └─ ERROR: Failed to match any regex pattern
+3    --VHeavy_raw_cDNA_TN91247-1-C01-A96Well.ab1        → FAILED.ab1                          ⚠ WARN    
+     └─ ERROR: Failed to match any regex pattern
+4    --VHeavy_raw_cDNA_TN91251-1-D01-A96Well.ab1        → FAILED.ab1                          ⚠ WARN    
+     └─ ERROR: Failed to match any regex pattern
+
+====================================================================================================
+Writing logs...
+====================================================================================================
+✓ Mapping log: data/logs/id_mapping.txt
+✓ Detailed log: data/logs/id_processing_detailed_20251205_102207.log
+✓ Summary log: data/logs/id_processing_summary_20251205_102207.log
+✓ Errors log: data/logs/id_processing_errors_20251205_102207.log
+
+====================================================================================================
+Summary:
+  Total processed: 4
+  Renamed: 0
+  Skipped: 0
+  Failed: 8
+====================================================================================================
+
+
+Step 1: AB1 to FASTA conversion...
+/home/admalexm/miniconda3/envs/vhh-pipeline/lib/python3.11/site-packages/Bio/Seq.py:2877: BiopythonWarning: Partial codon, len(sequence) not a multiple of three. Explicitly trim the sequence or add trailing N before translation. This may become an error in future.
+  warnings.warn(
+
+================================================================================
+AB1 to FASTA Conversion and 3-Frame Translation
+================================================================================
+Found 4 .ab1 files
+Processing strand: forward
+
+#    File Name (Normalized ID)                          Seq Length     
+---------------------------------------------------------------------
+1    --VHeavy_raw_cDNA_TN3139_01-1-F02-A96Well          320             nt
+2    --VHeavy_raw_cDNA_TN91240-1-B01-A96Well            364             nt
+3    --VHeavy_raw_cDNA_TN91247-1-C01-A96Well            359             nt
+4    --VHeavy_raw_cDNA_TN91251-1-D01-A96Well            360             nt
+
+================================================================================
+Writing output files...
+================================================================================
+✓ Raw nucleotide sequences: 4 sequences
+  File: data/intermediate/raw_seqs.fasta
+✓ Translated protein sequences: 12 sequences
+  File: data/intermediate/translated_frames.fasta
+  Expected: 4 files × 3 frames = 12
+  ✓ All frames successfully translated!
+
+================================================================================
+✓ COMPLETE
+  Raw sequences: data/intermediate/raw_seqs.fasta
+  Protein frames: data/intermediate/translated_frames.fasta
+================================================================================
+
+
+Step 2: ANARCI annotation and filtering...
+
+============================================================
+Step 1: Running ANARCI on data/intermediate/translated_frames.fasta
+============================================================
+Running command: ANARCI -i data/intermediate/translated_frames.fasta --scheme imgt --csv --outfile anarci_temp
+✓ ANARCI completed successfully
+
+============================================================
+Step 2: Parsing ANARCI output
+============================================================
+Found 0 ANARCI output file(s)
+✓ Parsed 0 sequences from ANARCI output
+✗ No sequences parsed from ANARCI output

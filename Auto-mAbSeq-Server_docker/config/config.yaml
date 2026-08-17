@@ -1,0 +1,100 @@
+ab1_conversion:
+  forward_line: false
+alignment:
+  clustering: none
+  group_by_chain: true
+  num_threads: 4
+  output_formats:
+  - fasta
+  - clustal
+  tool: clustalo
+anarci:
+  max_aa: 150
+  max_stops: 3
+  min_aa: 80
+  scheme: imgt
+id_processing:
+  enabled: true
+  log_file: data/logs/id_mapping.txt
+  log_transformations: true
+  method: hybrid
+  output_format: '{chain}_cDNA_{animal}_{sample}'
+  regex_patterns:
+  - groups:
+      animal: 2
+      chain: 1
+      sample: 3
+    name: format_simple
+    pattern: (VHH|VHeavy|VKappa|VLambda)_cDNA_(Cm|Ov|Ms|Rb|Rt)_((lib#\d+|[A-Z]+\d+)(?:_[^_\-NFRU][^_\-]*)*)
+  - groups:
+      animal: 2
+      chain: 1
+      sample: 3
+    name: format_with_dash
+    pattern: ^--(?:(VHH|VHeavy|VKappa|VLambda))_raw(?:_seq)?_cDNA_(Cm|Ov|Ms|Rb|Rt)_((lib#\d+|[A-Z]+\d+)(?:_[^_\-NFRU][^_\-]*)?)(?:[\-_].*)?$
+  - groups:
+      animal: 2
+      chain: 1
+      sample: 3
+    name: format_with_plate_timestamp
+    pattern: (?:^[A-H](?:[1-9]|1[0-2])_)?(?:(VHH|VHeavy|VKappa|VLambda))_raw(?:_seq)?_cDNA_(Cm|Ov|Ms|Rb|Rt)_((lib#\d+|[A-Z]+\d+)(?:_[^_\-NFRU][^_\-]*)?)(?:_\d{8}_\d{6})?$
+  strict_mode: false
+  valid_animals:
+  - Cm
+  - Ov
+  - Ms
+  - Rb
+  - Rt
+  valid_chains:
+  - VHH
+  - VHeavy
+  - VKappa
+  - VLambda
+logging:
+  console_output: true
+  level: INFO
+  log_directory: data/logs
+output_directories:
+  intermediate: data/intermediate
+  logs: data/logs
+  raw_data: data/raw/sanger
+  result_subdirs:
+    alignment: data/results/alignment
+    dna_files: data/results/dna_files
+    final_files: data/results/final_snapgene
+    qc: data/results/qc
+  results: data/results
+paths:
+  ab1_pattern: data/raw/sanger/*.ab1
+  anarci_output_fasta: data/intermediate/vhh_valid_anarci.fasta
+  anarci_temp_csv: data/intermediate/anarci_temp.csv
+  protein_output_fasta: data/results/dna_files/protein_valid_anarci.fasta
+  translated_fasta: data/intermediate/translated_frames.fasta
+pipeline:
+  dry_run: false
+  steps:
+  - description: Normalize .ab1 file IDs to standard format
+    enabled: true
+    name: normalize_ids
+  - description: Convert .ab1 files to FASTA with 3-frame translation
+    enabled: true
+    name: ab1_to_fasta
+  - description: Run ANARCI annotation and filtering
+    enabled: true
+    name: anarci_annotation
+  - description: Extract verified nucleotide sequences
+    enabled: true
+    name: extract_verified
+  - description: Create individual .dna files
+    enabled: true
+    name: create_dna_files
+  - description: Normalize protein sequence IDs from ANARCI results
+    enabled: true
+    name: normalize_protein_ids
+  - description: Build multiple sequence alignment
+    enabled: true
+    name: build_msa
+  - description: Create final SnapGene files with integrated traces and CDS annotations
+    enabled: true
+    name: create_final_snapgene
+  stop_on_error: true

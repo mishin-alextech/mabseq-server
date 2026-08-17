@@ -1,0 +1,48 @@
+# docker-compose.yml
+
+version: '3.8'
+
+services:
+  auto-mabseq:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: Auto-mAbSeq-app
+    ports:
+      - "5000:5000"
+    volumes:
+      # Монтировать директорию для данных (персистентное хранилище)
+      - auto-mabseq-data:/data
+      # Монтировать config (чтобы можно было обновлять)
+      - ./config:/app/config
+      # Монтировать скрипты (для отладки)
+      - ./workflow/scripts:/app/workflow/scripts
+    environment:
+      # Переменные окружения для контейнера
+      DATA_DIR: /data
+      RAW_DATA_DIR: /data/raw/sanger
+      INTERMEDIATE_DIR: /data/intermediate
+      RESULTS_DIR: /data/results
+      LOGS_DIR: /data/logs
+      FLASK_APP: app.py
+      FLASK_ENV: production
+      PYTHONUNBUFFERED: "1"
+    # Здоровье контейнера
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    # Перезагрузка при падении
+    restart: unless-stopped
+    # Логи
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  auto-mabseq-data:
+    driver: local

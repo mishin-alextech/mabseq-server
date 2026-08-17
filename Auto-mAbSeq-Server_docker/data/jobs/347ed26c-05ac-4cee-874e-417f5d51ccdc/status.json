@@ -1,0 +1,10 @@
+{
+  "job_id": "347ed26c-05ac-4cee-874e-417f5d51ccdc",
+  "status": "failed",
+  "created_at": "2025-12-08T12:24:52.447706",
+  "started_at": "2025-12-08T12:24:52.470641",
+  "completed_at": null,
+  "progress": 0,
+  "error": "20251208_122452.log\n\n====================================================================================================\nSummary:\n  Total processed: 20\n  Renamed: 19\n  Skipped: 0\n  Failed: 2\n====================================================================================================\n\n\nStep 1: AB1 to FASTA conversion...\n  File \"/home/admalexm/Auto-mAbSeq-Server/workflow/scripts/convert_ab1_multiframe.py\", line 53\n    \"\n    ^\nSyntaxError: unterminated string literal (detected at line 53)\n",
+  "message": "Pipeline failed"
+}

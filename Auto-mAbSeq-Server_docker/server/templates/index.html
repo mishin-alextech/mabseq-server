@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto-mAbSeq-Server</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: white;
+            font-size: 30px;
+            font-weight: bold;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 4px;
+            background: #667eea;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        /* File Upload */
+        .upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 50px 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f9f9f9;
+            min-height: 180px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .upload-area:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+            transform: scale(1.01);
+        }
+
+        .upload-area.dragover {
+            border-color: #667eea;
+            background: #e8eef7;
+            transform: scale(1.03);
+            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.2);
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .upload-text {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .upload-text strong {
+            color: #333;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        /* Upload Progress */
+        .upload-progress {
+            margin-top: 15px;
+            padding: 12px;
+            background: #e8f5e9;
+            border-radius: 6px;
+            border-left: 4px solid #4caf50;
+        }
+
+        .upload-progress .progress-bar {
+            height: 4px;
+            background: #ddd;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .upload-progress .progress-fill {
+            height: 100%;
+            background: #4caf50;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .upload-progress .progress-text {
+            font-size: 12px;
+            color: #2e7d32;
+            text-align: center;
+        }
+
+        .file-list {
+            margin-top: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .file-item {
+            background: #f5f5f5;
+            padding: 10px 12px;
+            border-radius: 4px;
+            margin-bottom: 5px;
+            font-size: 12px;
+            color: #666;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .file-item .remove {
+            cursor: pointer;
+            color: #999;
+            font-weight: bold;
+            font-size: 16px;
+            transition: color 0.2s;
+        }
+
+        .file-item .remove:hover {
+            color: #d32f2f;
+        }
+
+        /* Parameters */
+        .parameter {
+            margin-bottom: 20px;
+        }
+
+        .parameter-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .parameter-label label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .parameter-value {
+            font-size: 12px;
+            color: #999;
+        }
+
+        /* Strand value styling */
+        .strand-value {
+            font-size: 14px;
+            font-weight: 700;
+            color: #000000;
+        }
+
+        /* Toggle */
+        .toggle {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+
+        .toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: #667eea;
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+        }
+
+        /* Dropdown */
+        select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #333;
+            background-color: white;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+
+        select:hover {
+            border-color: #bbb;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        /* Slider */
+        input[type="range"] {
+            width: 100%;
+            height: 4px;
+            border-radius: 2px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-submit:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-reset {
+            background: #f5f5f5;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+
+        .btn-reset:hover {
+            background: #eee;
+        }
+
+        /* Status */
+        .status-container {
+            display: none;
+            background: #f9f9f9;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 30px;
+            border-left: 4px solid #667eea;
+        }
+
+        .status-container.show {
+            display: block;
+        }
+
+        .status-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .status-title {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-badge.queued {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .status-badge.running {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .status-badge.completed {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+
+        .status-badge.failed {
+            background: #ffebee;
+            color: #d32f2f;
+        }
+
+        .status-message {
+            color: #666;
+            font-size: 13px;
+            margin-bottom: 15px;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            font-size: 12px;
+            color: #999;
+            text-align: right;
+        }
+
+        .status-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn-small {
+            flex: 1;
+            padding: 8px;
+            font-size: 12px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn-download {
+            background: #4caf50;
+            color: white;
+        }
+
+        .btn-download:hover {
+            background: #45a049;
+        }
+
+        .btn-delete {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #da190b;
+        }
+
+        .error-message {
+            background: #ffebee;
+            color: #d32f2f;
+            padding: 12px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-size: 12px;
+        }
+
+        .info-text {
+            font-size: 12px;
+            color: #999;
+            margin-top: 8px;
+            line-height: 1.5;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 22px;
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">🧬</div>
+            <h1>Auto-mAbSeq</h1>
+            <p>Antibody Sequence Analysis</p>
+        </div>
+
+        <!-- Main Form -->
+        <form id="pipelineForm">
+            <!-- File Upload -->
+            <div class="section">
+                <div class="section-title">Upload .ab1 Files</div>
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📁</div>
+                    <div class="upload-text">
+                        Кинь в меня свои грязные .ab1 files или перетащи сюда до 100 файлов
+                    </div>
+                    <input type="file" id="fileInput" multiple accept=".ab1">
+                </div>
+
+                <!-- Upload Progress -->
+                <div class="upload-progress" id="uploadProgress" style="display: none;">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="uploadProgressFill"></div>
+                    </div>
+                    <div class="progress-text">
+                        Файлы загружены: <span id="uploadedCount">0</span> из <span id="totalCount">0</span>
+                    </div>
+                </div>
+
+                <div class="file-list" id="fileList"></div>
+                <div class="info-text">
+                    💡 Поддерживаются: AB1 Sanger секвенирование (макс 100 файлов, макс 50МБ)
+                </div>
+            </div>
+
+            <!-- Parameters -->
+            <div class="section">
+                <div class="section-title">Parameters</div>
+
+                <!-- Forward Line Toggle -->
+                <div class="parameter">
+                    <div class="parameter-label">
+                        <label for="forwardLine">С какой стороны ты секвенировал/секвенировала?</label>
+                        <span class="parameter-value strand-value" id="forwardValue">Reverse Complement</span>
+                    </div>
+                    <label class="toggle">
+                        <input type="checkbox" id="forwardLine" name="forward_line">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <!-- Min AA Slider -->
+                <div class="parameter">
+                    <div class="parameter-label">
+                        <label for="minAa">Минимальная длина AA</label>
+                        <span class="parameter-value" id="minAaValue">80</span>
+                    </div>
+                    <input type="range" id="minAa" name="min_aa" min="50" max="120" value="80">
+                </div>
+
+                <!-- Max AA Slider -->
+                <div class="parameter">
+                    <div class="parameter-label">
+                        <label for="maxAa">Максимальная длина AA</label>
+                        <span class="parameter-value" id="maxAaValue">150</span>
+                    </div>
+                    <input type="range" id="maxAa" name="max_aa" min="100" max="200" value="150">
+                </div>
+
+                <!-- Scheme Dropdown -->
+                <div class="parameter">
+                    <div class="parameter-label">
+                        <label for="scheme">Схема нумерации</label>
+                    </div>
+                    <select id="scheme" name="scheme">
+                        <option value="imgt">IMGT</option>
+                        <option value="kabat">Kabat</option>
+                        <option value="chothia">Chothia</option>
+                    </select>
+                </div>
+
+                <!-- Tool Dropdown -->
+                <div class="parameter">
+                    <div class="parameter-label">
+                        <label for="tool">Инструмент выравнивания</label>
+                    </div>
+                    <select id="tool" name="tool">
+                        <option value="clustalo">Clustal Omega</option>
+                        <option value="mafft">MAFFT</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="btn-group">
+                <button type="submit" class="btn-submit" id="submitBtn">Начать анализ</button>
+                <button type="reset" class="btn-reset" id="resetBtn">Очистить</button>
+            </div>
+        </form>
+
+        <!-- Status -->
+        <div class="status-container" id="statusContainer">
+            <div class="status-header">
+                <span class="status-title">Статус задачи</span>
+                <span class="status-badge" id="statusBadge">ОЧЕРЕДЬ</span>
+            </div>
+
+            <div class="status-message" id="statusMessage">Waiting to process...</div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text"><span id="progressPercent">0</span>%</div>
+
+            <div class="status-actions">
+                <button class="btn-small btn-download" id="downloadBtn" disabled>Скачать результаты</button>
+                <button class="btn-small btn-delete" id="deleteBtn">Удалить задачу</button>
+            </div>
+
+            <div id="errorContainer"></div>
+        </div>
+    </div>
+
+    <script>
+        let selectedFiles = [];
+        let currentJobId = null;
+        let statusInterval = null;
+
+        // ============================================
+        // File Upload Handling
+        // ============================================
+
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const fileList = document.getElementById('fileList');
+
+        uploadArea.addEventListener('click', () => fileInput.click());
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+
+        function handleFiles(files) {
+            selectedFiles = [];
+            for (let file of files) {
+                if (file.name.endsWith('.ab1')) {
+                    selectedFiles.push(file);
+                }
+            }
+            if (selectedFiles.length > 100) {
+                selectedFiles = selectedFiles.slice(0, 100);
+            }
+            updateFileList();
+        }
+
+        function updateFileList() {
+            fileList.innerHTML = '';
+
+            if (selectedFiles.length > 0) {
+                document.getElementById('uploadProgress').style.display = 'block';
+                document.getElementById('totalCount').textContent = selectedFiles.length;
+                document.getElementById('uploadedCount').textContent = selectedFiles.length;
+
+                const progress = (selectedFiles.length / 100) * 100;
+                document.getElementById('uploadProgressFill').style.width = progress + '%';
+            } else {
+                document.getElementById('uploadProgress').style.display = 'none';
+            }
+
+            selectedFiles.forEach((file, index) => {
+                const item = document.createElement('div');
+                item.className = 'file-item';
+                item.innerHTML = `
+                    <span>📄 ${file.name} (${(file.size / 1024).toFixed(1)} KB)</span>
+                    <span class="remove" onclick="removeFile(${index})" title="Remove">×</span>
+                `;
+                fileList.appendChild(item);
+            });
+        }
+
+        function removeFile(index) {
+            selectedFiles.splice(index, 1);
+            updateFileList();
+        }
+
+        // ============================================
+        // Parameter Handling
+        // ============================================
+
+        document.getElementById('forwardLine').addEventListener('change', function() {
+            document.getElementById('forwardValue').textContent = this.checked ? 'Forward' : 'Reverse Complement';
+        });
+
+        document.getElementById('minAa').addEventListener('input', function() {
+            document.getElementById('minAaValue').textContent = this.value;
+        });
+
+        document.getElementById('maxAa').addEventListener('input', function() {
+            document.getElementById('maxAaValue').textContent = this.value;
+        });
+
+        // ============================================
+        // Form Submission
+        // ============================================
+
+        document.getElementById('pipelineForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            if (selectedFiles.length === 0) {
+                alert('Пожалуйста, выберите хотя бы один .ab1 файл');
+                return;
+            }
+
+            const formData = new FormData();
+            selectedFiles.forEach(file => {
+                formData.append('files', file);
+            });
+            formData.append('forward_line', document.getElementById('forwardLine').checked);
+            formData.append('min_aa', document.getElementById('minAa').value);
+            formData.append('max_aa', document.getElementById('maxAa').value);
+            formData.append('scheme', document.getElementById('scheme').value);
+            formData.append('tool', document.getElementById('tool').value);
+
+            document.getElementById('submitBtn').disabled = true;
+
+            try {
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Upload failed: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                currentJobId = data.job_id;
+
+                document.getElementById('statusContainer').classList.add('show');
+
+                pollStatus();
+                statusInterval = setInterval(pollStatus, 2000);
+
+            } catch (error) {
+                alert(`Ошибка: ${error.message}`);
+                document.getElementById('submitBtn').disabled = false;
+            }
+        });
+
+        // ============================================
+        // Status Polling
+        // ============================================
+
+        async function pollStatus() {
+            if (!currentJobId) return;
+
+            try {
+                const response = await fetch(`/api/jobs/${currentJobId}/status`);
+                if (!response.ok) throw new Error('Status request failed');
+
+                const status = await response.json();
+
+                const badge = document.getElementById('statusBadge');
+                badge.textContent = status.status.toUpperCase();
+                badge.className = `status-badge ${status.status}`;
+
+                document.getElementById('statusMessage').textContent = status.message;
+
+                document.getElementById('progressFill').style.width = `${status.progress}%`;
+                document.getElementById('progressPercent').textContent = status.progress;
+
+                if (status.status === 'completed') {
+                    clearInterval(statusInterval);
+                    document.getElementById('downloadBtn').disabled = false;
+                } else if (status.status === 'failed') {
+                    clearInterval(statusInterval);
+                    const errorContainer = document.getElementById('errorContainer');
+                    errorContainer.innerHTML = `<div class="error-message">Ошибка: ${status.error || 'Pipeline failed'}</div>`;
+                }
+
+            } catch (error) {
+                console.error('Poll error:', error);
+            }
+        }
+
+        // ============================================
+        // Download Results
+        // ============================================
+
+        document.getElementById('downloadBtn').addEventListener('click', async () => {
+            if (!currentJobId) return;
+
+            try {
+                const response = await fetch(`/api/jobs/${currentJobId}/download`);
+                if (!response.ok) throw new Error('Download failed');
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                
+                const now = new Date();
+                const timestamp = now.toISOString().slice(0, 19).replace(/[-:T]/g, '_');
+                a.download = `mAbSeq_results_${timestamp}.zip`;
+                
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+
+                resetForm();
+
+            } catch (error) {
+                alert(`Ошибка загрузки: ${error.message}`);
+            }
+        });
+
+        // ============================================
+        // Delete Job
+        // ============================================
+
+        document.getElementById('deleteBtn').addEventListener('click', async () => {
+            if (!currentJobId) return;
+
+            if (!confirm('Удалить эту задачу и все результаты?')) return;
+
+            try {
+                const response = await fetch(`/api/jobs/${currentJobId}`, {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok) throw new Error('Delete failed');
+
+                clearInterval(statusInterval);
+                resetForm();
+
+            } catch (error) {
+                alert(`Ошибка удаления: ${error.message}`);
+            }
+        });
+
+        function resetForm() {
+            document.getElementById('pipelineForm').reset();
+            selectedFiles = [];
+            updateFileList();
+            currentJobId = null;
+            document.getElementById('statusContainer').classList.remove('show');
+            document.getElementById('submitBtn').disabled = false;
+            document.getElementById('forwardValue').textContent = 'Reverse Complement';
+            document.getElementById('minAaValue').textContent = '80';
+            document.getElementById('maxAaValue').textContent = '150';
+        }
+
+        document.getElementById('resetBtn').addEventListener('click', resetForm);
+    </script>
+</body>
+</html>

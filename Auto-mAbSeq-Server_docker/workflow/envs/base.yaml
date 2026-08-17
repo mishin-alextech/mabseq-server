@@ -1,0 +1,22 @@
+name: automabseq
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - python=3.11
+  - biopython>=1.81
+  - pyyaml>=6.0
+  - pandas>=2.0
+  - numpy>=1.24
+  - hmmer>=3.3.2
+  - clustalo>=1.2.22
+  - pip
+  - pip:
+    - git+https://github.com/jkbonfield/io_lib.git
+    - anarci>=0.5.2
+    - autosnapgene
+
+#создает окружение automabseq с установленными пакетами программ, необходимыми для работы пайплайна
+#команда для создания: conda env create -f workflow/envs/base.yaml
+#активация: conda activate automabseq
